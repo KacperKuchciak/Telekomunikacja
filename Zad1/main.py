@@ -11,12 +11,13 @@ H = [[1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
      [0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0],
      [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]]
 
-
 """
 Otrzymujemy tablicę intów znaku do zakodowania. Bity wiadomości przepisujemy,
 zaś dodatkowo dołączamy bity parzystości obliczane odpowiednią funkcją
 (iloczyn macierzy H i wektora przedstawiającego wiadomość do zakodowania).
 """
+
+
 def zakoduj(wiadomosc_integer):
     wiadomosc_po_zakodowaniu = []
     for bit in wiadomosc_integer:
@@ -30,10 +31,12 @@ def zakoduj(wiadomosc_integer):
 Obliczamy składową iloczynu macierzy H i wektora z wiadomością dla
 poszczególnej kolmny. Otrzymujemy odpowiedni bit parzystości.
 """
+
+
 def obliczBitParzystosci(wiersz, wiadomosc_integer):
-    suma:int = 0
+    suma: int = 0
     for kolumna in range(0, 8):
-        suma += (wiadomosc_integer[kolumna] * H[wiersz][kolumna] )
+        suma += (wiadomosc_integer[kolumna] * H[wiersz][kolumna])
     return suma % 2
 
 
@@ -88,6 +91,38 @@ if __name__ == '__main__':
             plik1.close()
             plik2.close()
             plik3.close()
+        if wybor == 5:
+            print("zaczynam")
+            plik1 = open("zakodowana_wiadomosc_oryginal.txt", 'r')
+            plik2 = open("zdekodowana_wiadomosc.txt", 'w')
+            wczytana_linia = plik1.read()
+            plik1.close()
+            """
+            Ponizszy for pozwala nam operowac na poszczegolnych szesnastkach bitow, 
+            czyli u nas na jednej literce.
+            """
+            for i in range(int(len(wczytana_linia) / 16)):
+                zakodowana_wiadomosc = str(wczytana_linia[i * 16: (i + 1) * 16])
+                print("Zczytany znak w postaci binarnej")
+                print(zakodowana_wiadomosc)
 
 
+                """
+                TODO: sprawdzanie i poprawianie bledu
+                """
 
+
+                """
+                Mechanizm sprawdzania i poprawiania bledow pozwala nam uzyc juz gotowej pierwsze osemki bitow 
+                z wiadomosci by przekonwertowac ja na ASCII i odczytac.
+                """
+                fragment_do_odkodowania = zakodowana_wiadomosc[:8]
+                plik2.write(chr(int(fragment_do_odkodowania[:8], 2)))
+                """
+                Konwertujemy jakiegos inta na chara, a wiec na jakis element tablicy ASCII.
+                Fragment int(str, 2) mowi, ze to co podamy w stringu bedzie w systemie dwojkowym i ma to
+                przeliczyc na dziesietny, potem poda do chara i ten wypluje na przyklad char(65) czyli A
+                """
+                print(chr(int(fragment_do_odkodowania[:8], 2)))
+            print("Zadekodowano wiadomosc")
+            plik2.close()
