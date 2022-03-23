@@ -40,6 +40,74 @@ def obliczBitParzystosci(wiersz, wiadomosc_integer):
     return suma % 2
 
 
+"""
+Funkcja wykrywająca miejsce błędu. Dzięki pomnożeniu wiadomości przez
+daną kolumnę macierzy, zostaje wygenerowany wektor błędu. O błędzie świadczy
+obecność, w jakimkolwiek miejscu, jedynki w wektorze błędu.
+"""
+
+
+def dokonajSprawdzenia(wiadomosc_integer):
+    Blad = []
+    flaga = True
+    for wiersz in range(0, 8):
+        suma = obliczBitParzystosci(wiersz, wiadomosc_integer)
+        Blad.append(suma)
+        if suma == 1:
+            flaga = False
+    if not flaga:
+        print("Wektor błędu:", Blad)
+        dokonajPoprawy(wiadomosc_integer, Blad)
+    elif flaga:
+        print("Nie wykryto błędu")
+
+
+"""
+Funkcja wyszukująca, w którym miejscu znajduje się błąd i poprawiająca go.
+
+W przypadku jednego błędu:
+- porównuje wektor błędu z kolumnami w macierzy. Jeśli jakaś kolumna i wektor będą
+sobie równe, to w tym miejscu w wiadomości znajduje się błąd. Działa na zasadzie
+takiej, że jeżeli np. wektor błędu zgadza się z trzecią kolumną, to w trzecim miejscu
+w wiadomości znajduje się błąd. Bit w tym miejscu program zmienia na przeciwny.
+Jeżeli funkcja nie wykryje błędu, to przechodzi do drugiego przypadku, dwóch błędów
+
+W przypadku dwóch błędów:
+- XOR'uje ze sobą 2 kolumny w macierzy i porównuje je z wektorem błędu. W przypadku, gdy
+suma kolumn = wektorowi błędu, następuje wykrycie błędu.
+"""
+
+
+def dokonajPoprawy(wiadomosc_integer, Blad):
+    for kolumna in range(0, 16):
+        for wiersz in range(0, 8):
+            if H[wiersz][kolumna] != Blad[wiersz]:
+                break
+            if wiersz == 7:
+                wiadomosc_integer[kolumna] = zmien(wiadomosc_integer[kolumna])
+                return
+    for kolumna in range(0, 16):
+        for i in range(kolumna, 16):
+            for wiersz in range(0, 8):
+                if H[wiersz][kolumna] ^ H[wiersz][i] != Blad[wiersz]:
+                    break
+                if wiersz == 7:
+                    wiadomosc_integer[kolumna] = zmien(wiadomosc_integer[kolumna])
+                    wiadomosc_integer[i] = zmien(wiadomosc_integer[i])
+                    return
+
+
+"""
+Funkcja zmieniajaca bit na przeciwny.
+"""
+
+
+def zmien(bit):
+    if bit == 0:
+        return 1
+    else:
+        return 0
+
 if __name__ == '__main__':
     while True:
 
