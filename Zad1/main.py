@@ -35,7 +35,7 @@ poszczególnej kolmny. Otrzymujemy odpowiedni bit parzystości.
 
 def obliczBitParzystosci(wiersz, wiadomosc_integer):
     suma: int = 0
-    for kolumna in range(0, 8):
+    for kolumna in range(len(wiadomosc_integer)):
         suma += (wiadomosc_integer[kolumna] * H[wiersz][kolumna])
     return suma % 2
 
@@ -57,21 +57,20 @@ def dokonajSprawdzenia(wiadomosc_integer):
             flaga = False
     if not flaga:
         print("Wektor błędu:", Blad)
-        dokonajPoprawy(wiadomosc_integer, Blad)
+        wiadomosc_integer = dokonajPoprawy(wiadomosc_integer, Blad)
     elif flaga:
         print("Nie wykryto błędu")
+    return wiadomosc_integer
 
 
 """
 Funkcja wyszukująca, w którym miejscu znajduje się błąd i poprawiająca go.
-
 W przypadku jednego błędu:
 - porównuje wektor błędu z kolumnami w macierzy. Jeśli jakaś kolumna i wektor będą
 sobie równe, to w tym miejscu w wiadomości znajduje się błąd. Działa na zasadzie
 takiej, że jeżeli np. wektor błędu zgadza się z trzecią kolumną, to w trzecim miejscu
 w wiadomości znajduje się błąd. Bit w tym miejscu program zmienia na przeciwny.
 Jeżeli funkcja nie wykryje błędu, to przechodzi do drugiego przypadku, dwóch błędów
-
 W przypadku dwóch błędów:
 - XOR'uje ze sobą 2 kolumny w macierzy i porównuje je z wektorem błędu. W przypadku, gdy
 suma kolumn = wektorowi błędu, następuje wykrycie błędu.
@@ -85,7 +84,6 @@ def dokonajPoprawy(wiadomosc_integer, Blad):
                 break
             if wiersz == 7:
                 wiadomosc_integer[kolumna] = zmien(wiadomosc_integer[kolumna])
-                return
     for kolumna in range(0, 16):
         for i in range(kolumna, 16):
             for wiersz in range(0, 8):
@@ -94,7 +92,9 @@ def dokonajPoprawy(wiadomosc_integer, Blad):
                 if wiersz == 7:
                     wiadomosc_integer[kolumna] = zmien(wiadomosc_integer[kolumna])
                     wiadomosc_integer[i] = zmien(wiadomosc_integer[i])
-                    return
+    print("Poprawiony znak:")
+    print(wiadomosc_integer)
+    return wiadomosc_integer
 
 
 """
@@ -114,11 +114,9 @@ if __name__ == '__main__':
         """
         Menu pozwalające wybrać co chemy zrobić.
         """
-
-        wybor: int = 0
-        print("Wybierz operacje, ktora chcesz wykonac:")
-        while wybor != 1 | wybor != 2 | wybor != 3:
-            wybor = int(input("1.Zakoduj podana w pliku wiadomosc,\n"
+        wybor:int = 0
+        while wybor not in range(1, 3):
+            wybor:int = int(input("1.Zakoduj podana w pliku wiadomosc,\n"
                               "2.Odkoduj i sprawdz zakodowana wiadomosc.\n"
                               "3.Wyjdz z programu\n"))
         if wybor == 3:
@@ -159,7 +157,7 @@ if __name__ == '__main__':
             plik1.close()
             plik2.close()
             plik3.close()
-        if wybor == 5:
+        if wybor == 2:
             print("zaczynam")
             plik1 = open("zakodowana_wiadomosc_oryginal.txt", 'r')
             plik2 = open("zdekodowana_wiadomosc.txt", 'w')
@@ -171,20 +169,21 @@ if __name__ == '__main__':
             """
             for i in range(int(len(wczytana_linia) / 16)):
                 zakodowana_wiadomosc = str(wczytana_linia[i * 16: (i + 1) * 16])
+                bity = []
+                for j in range(16):
+                    bity.append(int(zakodowana_wiadomosc[j]))
                 print("Zczytany znak w postaci binarnej")
-                print(zakodowana_wiadomosc)
-
-
-                """
-                TODO: sprawdzanie i poprawianie bledu
-                """
-
+                print(bity)
+                wiad_int = dokonajSprawdzenia(bity)
+                napis = ""
+                for k in range(16):
+                    napis += str(wiad_int[k])
 
                 """
                 Mechanizm sprawdzania i poprawiania bledow pozwala nam uzyc juz gotowej pierwsze osemki bitow 
                 z wiadomosci by przekonwertowac ja na ASCII i odczytac.
                 """
-                fragment_do_odkodowania = zakodowana_wiadomosc[:8]
+                fragment_do_odkodowania = napis[:8]
                 plik2.write(chr(int(fragment_do_odkodowania[:8], 2)))
                 """
                 Konwertujemy jakiegos inta na chara, a wiec na jakis element tablicy ASCII.
@@ -192,5 +191,5 @@ if __name__ == '__main__':
                 przeliczyc na dziesietny, potem poda do chara i ten wypluje na przyklad char(65) czyli A
                 """
                 print(chr(int(fragment_do_odkodowania[:8], 2)))
-            print("Zadekodowano wiadomosc")
+            print("Zdekodowano wiadomosc")
             plik2.close()
